@@ -10,20 +10,28 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  int seed = atoi(argv[1]);
-  if (seed <= 0) {
-    printf("seed is a positive number\n");
+  // atoi() может вызвать undefined behavior для нечисловых строк
+  // Лучше использовать strtol() для более безопасного преобразования
+  char *endptr;
+  long seed = strtol(argv[1], &endptr, 10); 
+  if (*endptr != '\0' || seed <= 0 || seed > INT_MAX) { 
+    printf("Seed должно быть положительным целым числом.\n");
     return 1;
   }
 
-  int array_size = atoi(argv[2]);
-  if (array_size <= 0) {
-    printf("array_size is a positive number\n");
+  long array_size = strtol(argv[2], &endptr, 10);
+  if (*endptr != '\0' || array_size <= 0 || array_size > INT_MAX) {
+    printf("Array_size должно быть положительным целым числом.\n");
     return 1;
   }
 
   int *array = malloc(array_size * sizeof(int));
-  GenerateArray(array, array_size, seed);
+  if (array == NULL) {
+    printf("Ошибка выделения памяти.\n");
+    return 1;
+  }
+
+  GenerateArray(array, array_size, (int)seed);
   struct MinMax min_max = GetMinMax(array, 0, array_size);
   free(array);
 
